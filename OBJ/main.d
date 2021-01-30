@@ -71,3 +71,7 @@
 ..\obj\main.o: ..\HALLIB\Inc\stm32f4xx_ll_usb.h
 ..\obj\main.o: ..\HALLIB\Inc\stm32f4xx_hal_pcd_ex.h
 ..\obj\main.o: ..\HALLIB\Inc\stm32f4xx_hal_hcd.h
+..\obj\main.o: ..\SYSTEM\inc\sys.h
+..\obj\main.o: ..\SYSTEM\inc\delay.h
+..\obj\main.o: ..\SYSTEM\inc\usart.h
+..\obj\main.o: ..\HARDWARE\inc\led.h

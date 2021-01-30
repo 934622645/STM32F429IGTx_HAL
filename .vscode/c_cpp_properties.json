@@ -6,7 +6,8 @@
                 "${workspaceFolder}/CORE",
                 "${workspaceFolder}/HALLIB/inc",
                 "${workspaceFolder}/SYSTEM/inc",
-                "${workspaceFolder}/USER/inc"
+                "${workspaceFolder}/USER/inc",
+                "${workspaceFolder}/HARDWARE/inc"
             ],
             "defines": [
                 "_DEBUG",

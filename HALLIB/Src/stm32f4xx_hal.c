@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f4xx_hal.c
   * @author  MCD Application Team
-  * @version V1.4.4
-  * @date    22-January-2016
+  * @version V1.4.2
+  * @date    10-November-2015
   * @brief   HAL module driver.
   *          This is the common part of the HAL initialization
   *
@@ -23,7 +23,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -68,18 +68,18 @@
   * @{
   */
 /**
-  * @brief STM32F4xx HAL Driver version number V1.4.4
+  * @brief STM32F4xx HAL Driver version number V1.4.2
   */
 #define __STM32F4xx_HAL_VERSION_MAIN   (0x01) /*!< [31:24] main version */
 #define __STM32F4xx_HAL_VERSION_SUB1   (0x04) /*!< [23:16] sub1 version */
-#define __STM32F4xx_HAL_VERSION_SUB2   (0x04) /*!< [15:8]  sub2 version */
+#define __STM32F4xx_HAL_VERSION_SUB2   (0x02) /*!< [15:8]  sub2 version */
 #define __STM32F4xx_HAL_VERSION_RC     (0x00) /*!< [7:0]  release candidate */ 
-#define __STM32F4xx_HAL_VERSION         ((__STM32F4xx_HAL_VERSION_MAIN << 24U)\
-                                        |(__STM32F4xx_HAL_VERSION_SUB1 << 16U)\
-                                        |(__STM32F4xx_HAL_VERSION_SUB2 << 8U )\
+#define __STM32F4xx_HAL_VERSION         ((__STM32F4xx_HAL_VERSION_MAIN << 24)\
+                                        |(__STM32F4xx_HAL_VERSION_SUB1 << 16)\
+                                        |(__STM32F4xx_HAL_VERSION_SUB2 << 8 )\
                                         |(__STM32F4xx_HAL_VERSION_RC))
                                         
-#define IDCODE_DEVID_MASK    ((uint32_t)0x00000FFFU)
+#define IDCODE_DEVID_MASK    ((uint32_t)0x00000FFF)
 
 /* ------------ RCC registers bit address in the alias region ----------- */
 #define SYSCFG_OFFSET             (SYSCFG_BASE - PERIPH_BASE)
@@ -87,13 +87,13 @@
 /* Alias word address of UFB_MODE bit */ 
 #define MEMRMP_OFFSET             SYSCFG_OFFSET 
 #define UFB_MODE_BIT_NUMBER       POSITION_VAL(SYSCFG_MEMRMP_UFB_MODE)
-#define UFB_MODE_BB               (uint32_t)(PERIPH_BB_BASE + (MEMRMP_OFFSET * 32U) + (UFB_MODE_BIT_NUMBER * 4U)) 
+#define UFB_MODE_BB               (uint32_t)(PERIPH_BB_BASE + (MEMRMP_OFFSET * 32) + (UFB_MODE_BIT_NUMBER * 4)) 
 
 /* ---  CMPCR Register ---*/ 
 /* Alias word address of CMP_PD bit */ 
-#define CMPCR_OFFSET              (SYSCFG_OFFSET + 0x20U) 
+#define CMPCR_OFFSET              (SYSCFG_OFFSET + 0x20) 
 #define CMP_PD_BIT_NUMBER         POSITION_VAL(SYSCFG_CMPCR_CMP_PD)
-#define CMPCR_CMP_PD_BB           (uint32_t)(PERIPH_BB_BASE + (CMPCR_OFFSET * 32U) + (CMP_PD_BIT_NUMBER * 4U))
+#define CMPCR_CMP_PD_BB           (uint32_t)(PERIPH_BB_BASE + (CMPCR_OFFSET * 32) + (CMP_PD_BIT_NUMBER * 4))
 /**
   * @}
   */
@@ -103,7 +103,7 @@
 /** @addtogroup HAL_Private_Variables
   * @{
   */
-__IO uint32_t uwTick;
+static __IO uint32_t uwTick;
 /**
   * @}
   */
@@ -167,20 +167,20 @@ __IO uint32_t uwTick;
 HAL_StatusTypeDef HAL_Init(void)
 {
   /* Configure Flash prefetch, Instruction cache, Data cache */ 
-#if (INSTRUCTION_CACHE_ENABLE != 0U)
+#if (INSTRUCTION_CACHE_ENABLE != 0)
    __HAL_FLASH_INSTRUCTION_CACHE_ENABLE();
 #endif /* INSTRUCTION_CACHE_ENABLE */
 
-#if (DATA_CACHE_ENABLE != 0U)
+#if (DATA_CACHE_ENABLE != 0)
    __HAL_FLASH_DATA_CACHE_ENABLE();
 #endif /* DATA_CACHE_ENABLE */
 
-#if (PREFETCH_ENABLE != 0U)
+#if (PREFETCH_ENABLE != 0)
   __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
 #endif /* PREFETCH_ENABLE */
 
   /* Set Interrupt Group Priority */
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);//中断优先级分组2
 
   /* Use systick as time base source and configure 1ms tick (default clock after Reset is HSI) */
   HAL_InitTick(TICK_INT_PRIORITY);
@@ -228,6 +228,9 @@ HAL_StatusTypeDef HAL_DeInit(void)
   */
 __weak void HAL_MspInit(void)
 {
+  /* Prevent unused argument(s) compilation warning */
+  __IO uint32_t tmpreg = 0x00;
+  UNUSED(tmpreg);
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_MspInit could be implemented in the user file
    */
@@ -239,6 +242,9 @@ __weak void HAL_MspInit(void)
   */
 __weak void HAL_MspDeInit(void)
 {
+  /* Prevent unused argument(s) compilation warning */
+  __IO uint32_t tmpreg = 0x00;
+  UNUSED(tmpreg);
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_MspDeInit could be implemented in the user file
    */ 
@@ -263,10 +269,10 @@ __weak void HAL_MspDeInit(void)
 __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   /*Configure the SysTick to have interrupt in 1ms time basis*/
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000U);
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
   /*Configure the SysTick IRQ priority */
-  HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority ,0U);
+  HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority ,0);
 
   /* Return function status */
   return HAL_OK;
@@ -337,7 +343,7 @@ __weak uint32_t HAL_GetTick(void)
   */
 __weak void HAL_Delay(__IO uint32_t Delay)
 {
-  uint32_t tickstart = 0U;
+  uint32_t tickstart = 0;
   tickstart = HAL_GetTick();
   while((HAL_GetTick() - tickstart) < Delay)
   {
@@ -391,7 +397,7 @@ uint32_t HAL_GetHalVersion(void)
   */
 uint32_t HAL_GetREVID(void)
 {
-   return((DBGMCU->IDCODE) >> 16U);
+   return((DBGMCU->IDCODE) >> 16);
 }
 
 /**
@@ -501,7 +507,7 @@ void HAL_EnableMemorySwappingBank(void)
   *   
   * @note   This function can be used only for STM32F42xxx/43xxx devices. 
   *
-  * @note   The default state : Flash Bank1 mapped at 0x08000000 (and aliased @0x00000000) 
+  * @note   The default state : Flash Bank1 mapped at 0x08000000 (and aliased @0x0000 0000) 
   *         and Flash Bank2 mapped at 0x08100000 (and aliased at 0x00100000) 
   *           
   * @retval None
